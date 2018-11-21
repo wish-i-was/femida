@@ -278,11 +278,12 @@ class BurpExtender(IBurpExtender, ITab, IHttpListener, IMessageEditorController,
         filterMenu = JMenu("Femida XSS")
         self._contextMenuData = contextMenuInvocation
         if (context == 0 or context == 1 or
-            context == 2 or context == 3):
+            context == 2 or context == 3 or
+            context == 8 or context == 9):
             filterMenu.add(JMenuItem("Add to Headers", actionPerformed = self.addToHeadersItem))
             filterMenu.add(JMenuItem("Add to Parameters", actionPerformed = self.addToParametersItem))
-
-        return Arrays.asList(filterMenu)
+            return Arrays.asList(filterMenu)
+        return Arrays.asList([])
 
 
     def addToHeadersItem(self, event):
