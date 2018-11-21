@@ -242,6 +242,13 @@ class BurpExtender(IBurpExtender, ITab, IHttpListener, IMessageEditorController,
     def createAnyTable(self, table_model, table_number, min_size):
         _table = JTable(table_model)
         _table.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS)
+        for i in range(2):
+            column = _table.getColumnModel().getColumn(i)
+            if i == 0:
+                column.setPreferredWidth(250)
+            else:
+                column.setPreferredWidth(50)
+
         _scrolltable = JScrollPane(_table)
         _scrolltable.setMinimumSize(min_size)
         return _scrolltable
