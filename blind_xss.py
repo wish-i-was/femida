@@ -86,6 +86,7 @@ class PyRunnable(Runnable):
 
 class BurpExtender(IBurpExtender, ITab, IHttpListener, IMessageEditorController, AbstractTableModel, IContextMenuFactory, IScannerCheck):
     name = "Femida XSS"
+    conf_path = "./config.py"
     _jTabbedPane = JTabbedPane()
     _jPanel = JPanel()
     _jAboutPanel = JPanel()
@@ -158,6 +159,7 @@ class BurpExtender(IBurpExtender, ITab, IHttpListener, IMessageEditorController,
         self.createAnyView(self._jLabelTechniques, 0, 1, 3, 1, Insets(0, 0, 10, 0))
 
         self._jTextFieldURL = JTextField("", 30)
+        self._jTextFieldURL.addActionListener(self.setCallbackUrl)
         self.createAnyView(self._jTextFieldURL, 3, 1, 5, 1, Insets(0, 0, 10, 0))
 
         self._forkRequestButton = swing.JButton('Parallel Request',actionPerformed=self.forkRequest)
@@ -166,15 +168,15 @@ class BurpExtender(IBurpExtender, ITab, IHttpListener, IMessageEditorController,
 
         self._tableModelPayloads = DefaultTableModel() 
         self._tableModelPayloads.addColumn("Payload")
-        self._tableModelPayloads.addColumn("Using")
+        self._tableModelPayloads.addColumn("Active")
 
         self._tableModelHeaders = DefaultTableModel() 
         self._tableModelHeaders.addColumn("Header")
-        self._tableModelHeaders.addColumn("Using")
+        self._tableModelHeaders.addColumn("Active")
 
         self._tableModelParams = DefaultTableModel() 
         self._tableModelParams.addColumn("Parameter")
-        self._tableModelParams.addColumn("Using")
+        self._tableModelParams.addColumn("Active")
 
         self._payloadTable = self.createAnyTable(self._tableModelPayloads, 1, Dimension(300, 200))
         self.createAnyView(self._payloadTable, 0, 2, 3, 1, Insets(0, 0, 0, 10))
@@ -270,6 +272,28 @@ class BurpExtender(IBurpExtender, ITab, IHttpListener, IMessageEditorController,
         return table.getRowCount()
 
 
+    def replaceLine(self, file_path, new_line):
+        from tempfile import mkstemp
+        from shutil import move
+        from os import fdopen, remove
+        #Create temp file
+        fh, abs_path = mkstemp()
+        with fdopen(fh, 'w') as new_file:
+            with open(file_path) as old_file:
+                for line in old_file:
+                    a = re.findall('^Callback_url[ =]+(.+)$', line)
+                    if a:
+                        for k in a:
+                            temp = k.replace("\'", "").replace("\"", "")
+                            new_file.write(line.replace(temp, new_line))
+                    else:
+                        new_file.write(line)
+        #Remove original file
+        remove(file_path)
+        #Move new file
+        move(abs_path, file_path)
+
+
     def createAnyView(self, _component, gridx, gridy, gridwidth, gridheight, insets):
         self._jPanelConstraints.fill = GridBagConstraints.HORIZONTAL
         self._jPanelConstraints.gridx = gridx
@@ -339,6 +363,9 @@ class BurpExtender(IBurpExtender, ITab, IHttpListener, IMessageEditorController,
         self._tableModelHeaders.addTableModelListener(MyTableModelListener(self._tableModelHeaders, self, self._dictHeaders, config.Headers))
         self._tableModelParams.addTableModelListener(MyTableModelListener(self._tableModelParams, self, self._dictParams, config.Parameters))
 
+    def setCallbackUrl(self, event):
+        self.replaceLine(self.conf_path, self._jTextFieldURL.getText())
+        self.appendToResults('New url={} saved.'.format(self._jTextFieldURL.getText()))
 
     def addToPayload(self, button):
         self.insertAnyTable(self._tableModelPayloads, ['', '1'])
