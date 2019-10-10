@@ -10,36 +10,37 @@ Burp -> Extender -> Add -> find and select blind-xss.py
 
 ### Settings
 
-First of all you need to setup your callback URL in field called "Your url" and press Enter to automatically save it inside config.py file.
+First of all, you need to setup your callback URL in field called "Your url" and press Enter to automatically save it inside config.py file.
 
 ![save_callback](https://user-images.githubusercontent.com/9287220/51000574-9e546f00-153e-11e9-8af1-e4662194a1ec.gif)
 
-After you set it up you need to fill Payloads table with your OOB-XSS vectors, so extension will be able to inject your payloads into outgoing requests. Pay attantion that you need to set {URL} alias inside your payload, so the extension will be able to get data from "Your url" field and set it directly to your payload.
+After you set it up you need to fill Payloads table with your OOB-XSS vectors, so the extension will be able to inject your payloads into outgoing requests. Make sure that you properly set the {URL} alias inside your payload in order for the extension to be able to get data from the "Your url" field and adjust the payload accordingly.
 
 <img width="949" alt="config_example" src="https://user-images.githubusercontent.com/9287220/51000523-706f2a80-153e-11e9-8f8a-138cc257a482.png">
 
 #### Behaviours
-Femida is Random Driven Extension, so every payload with "1" inside row "Active" will be randomly used during your active or passive scanning. So if you want exclude any payload or parameter/header from testing just change the "Active" value to 0.
-
+Femida is Random Driven Extension, so every payload with "1" inside row "Active" will be randomly used during your active or passive scanning. Payloads and parameters/headers may be excluded from testing by changing their respective "Active" value to 0.
 
 #### Payloads
 - Add your payloads to the table using `Upload` or `Add` button.
-- **DO NOT FORGET** about `{URL}` parameter in your payloads.
-- When you add any data into tables, `Active` row will be manualy equal `1`. (mean it's active now)
-- If you want to make it **inactive** - set `Active` row to `0`
+- **DO NOT FORGET** about the `{URL}` parameter in your payloads.
+- All parameters are enabled by default. You may exclude specific values by setting their `Active` value to 0 inside the table.
 
 #### Headers & Parameters
-- You can add data manualy using `Add` button or in `Target`/`Proxy`/`Repeater` with right-click.
+- You can add data manually using the `Add` button or by right-clicking them and selecting the appropriate option in the `Target`/`Proxy`/`Repeater` tab.
 
 ![dec-26-2018 08-08-29](https://user-images.githubusercontent.com/9287220/51000531-782ecf00-153e-11e9-8b15-dec6b8ca87d9.gif)
-- Do not forget, taht headers and parameters are `case insensitive`.
-- If you want to make it **inactive** - set `Active` row to `0`.
+- Do not forget that headers and parameters are `case insensitive`.
+- You may exclude specific parameters by setting their `Active` value to `0`.
 
 ### Usage
-Extension is able to perform both active and passive checks.
+The extension is able to perform both active and passive checks.
 
-After all is setup you can start using extension. First case is passive checks, so we will cover this process now:
-1. Press button "Run proxy", while it's active extension is looking for configured parameters and headers. After successful find it's put payload into it. If you are find some troubles during your testing (WAF or Errors or etc.) you can turn on button "Parallel Request" so all requests with a payload will be sent in a background as a duplicate requests with payloads, but your main session will be clear so you will be able to check that everything is correct just by monitoring debug log.
+The following steps must be followed in order to perform a passive check:
+1. Enable the extension and start Burp's proxy. 
+1. When the extension successfully identifies a testable parameter, the payload is automatically injected into it.
+
+If you are having problems during your testing (WAF or Errors or etc.), you may use the "Parallel Request" feature in order to send generated requests in the background without clutttering your main session, thus allowing you to debug more efficiently.
 
 ###### Release version soon.
 ###### Video soon.
